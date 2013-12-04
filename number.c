@@ -32,6 +32,50 @@ void gen_safe_prime(mpz_t p, int bitlength, gmp_randstate_t r_state)
 	mpz_clear(q);
 }
 
+void gen_generator(mpz_t g, mpz_t p, gmp_randstate_t r_state)
+{
+	int done = 0;
+	mpz_t temp; mpz_init(temp);
+	mpz_t q; mpz_init_set(q, p);
+	mpz_t max; mpz_init(max);
+	mpz_sub_ui(max, p, 2);
+	mpz_sub_ui(q, q, 1);
+	mpz_cdiv_q_ui(q, q, 2);
+
+	while (!done)
+	{
+		mpz_urandomm(g, r_state, max);
+		mpz_add_ui(g, g, 2);
+
+		mpz_powm_ui(temp, g, 1, p);
+		if (mpz_cmp_ui(temp, 1) == 0) { // g^1 == 1 (mod p)
+			done = 0;
+			continue;
+		} else {
+			done = 1;
+		}
+
+		mpz_powm_ui(temp, g, 2, p);
+		if (mpz_cmp_ui(temp, 1) == 0) {
+			done = 0;
+			continue;
+		} else {
+			done = 1;
+		}
+
+		mpz_powm(temp, g, q, p);
+		if (mpz_cmp_ui(temp, 1) == 0 ) {
+			done = 0;
+			continue;
+		} else {
+			done = 1;
+		}
+			
+	}
+
+	mpz_clears(temp, q, NULL);
+}
+
 void gen_number(mpz_t p, int bitlength, gmp_randstate_t r_state)
 {
         mpz_t min_value, max_value, two;
@@ -60,4 +104,4 @@ void get_rand_seed(gmp_randstate_t r_state)
 	read(randomData, &seed, sizeof(seed));
 	gmp_randinit_default(r_state);
 	gmp_randseed_ui(r_state, seed);
-}	
+}
