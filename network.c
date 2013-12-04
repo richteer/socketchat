@@ -24,12 +24,12 @@ int net_init(char* ip, char* port)
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_DGRAM;
 
-	if ((NULL == server) || (NULL == port)) {
+	if ((NULL == ip) || (NULL == port)) {
 		fprintf(stderr,"Invalid server or port!\n");
 		return -1;
 	}
 
-	if ((rv = getaddrinfo(server,port,&hints,&servinfo)) != 0) {
+	if ((rv = getaddrinfo(ip,port,&hints,&servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return -2;
 	}
@@ -40,18 +40,18 @@ int net_init(char* ip, char* port)
 	}
 
 	if (NULL == p) {
-		fprintf(stderr, "Could not create a socket!\n", );
-		reval = -3;
+		fprintf(stderr, "Could not create a socket!\n");
+		retval = -3;
 		goto cleanup;
 	}
 
 	if (0 != bind(sfd, p->ai_addr, p->ai_addrlen)) {
 		#if DEBUG
-			perror("bind error")
-		#endif DEBUG
+			perror("bind error");
+		#endif
 
-		reval = -4;
-		close(sfd)
+		retval = -4;
+		close(sfd);
 		sfd = -1;
 		goto cleanup;
 	}
@@ -60,33 +60,35 @@ int net_init(char* ip, char* port)
 	serv_socksize = p->ai_addrlen;
 
 cleanup:
-	freeaddrinfo(&servinfo);
+	freeaddrinfo(servinfo);
 
 	return retval;
 }
 
-int net_close()
+void net_close()
 {
 	close(sfd);
 }
 
 int net_send(net_packet_t* pk)
 {
+	int ret;
 	if (NULL == pk) return -2;
 
-	if (-1 == (ret = sendto(sfd,pk,sizeof(net_packet_t),0,&servinfo,&serv_socksize)))
+	if (-1 == (ret = sendto(sfd,pk,sizeof(net_packet_t),0,&serv_addr,serv_socksize)))
 		perror("send failed");
 	return ret;
 }
 
 int net_recv(net_packet_t* pk)
 {
+	int ret;
 	struct sockaddr sa;
 	socklen_t sl;
 
-	if (NULL == buf) return -2;
+	if (NULL == pk) return -2;
 
-	if (-1 == (ret = recvfrom(sfd,buf,sizeof(net_packet_t),0,&sa,&sl)))
+	if (-1 == (ret = recvfrom(sfd,pk,sizeof(net_packet_t),0,&sa,&sl)))
 		perror("recvfrom failed");
 
 	return ret;
