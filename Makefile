@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall
 
-all: network.o test_number test_eg
+all: network.o client test_number test_eg
 
 test_number: test_number.c number.h number.c
 	@echo "Building test_number"
@@ -15,9 +15,9 @@ network.o: network.c network.h
 	@echo "Building the Network Library"
 	${CC} ${CFLAGS} -c $< -o $@
 
-client: client.c
+client: client.c network.o
 	@echo "Building the client"
-	${CC} ${CFLAGS} $< -o $@
+	${CC} ${CFLAGS} $^ -o $@
 
 clean: 
 	rm -rf *.o a.out client

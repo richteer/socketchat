@@ -10,10 +10,9 @@
 #include "network.h"
 
 int sfd = -1;
-struct sockaddr serv_addr;
-socklen_t serv_socksize;
+struct sockaddr_storage rem_addr;
 
-int net_init(char* ip, char* port)
+int net_connect(char* ip, char* port)
 {
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
@@ -21,43 +20,105 @@ int net_init(char* ip, char* port)
 
 	memset(&hints,0,sizeof(hints));
 	
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
 
-	if (/*(NULL == ip) || */(NULL == port)) {
-		fprintf(stderr,"Invalid server or port!\n");
+	if ((NULL == ip) || (NULL == port)) {
+		fprintf(stderr,"net_connect: Invalid server or port!\n");
 		return -1;
 	}
 
 	if ((rv = getaddrinfo(ip,port,&hints,&servinfo)) != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+		fprintf(stderr, "net_connect: getaddrinfo: %s\n", gai_strerror(rv));
 		return -2;
 	}
 
 	for (p = servinfo; p != NULL; p = p->ai_next) {
-		if (-1 != (sfd = socket(p->ai_family, p->ai_family, p->ai_protocol)))
+		if (-1 != (sfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)))
 			break;
 	}
 
 	if (NULL == p) {
-		fprintf(stderr, "Could not create a socket!\n");
+		fprintf(stderr, "net_connect: Could not create a socket!\n");
+		retval = -3;
+		goto cleanup;
+	}
+
+	if (0 != connect(sfd, p->ai_addr, p->ai_addrlen)) {
+		perror("net_connect: connect error");
+		retval = -4;
+		close(sfd);
+		sfd = -1;
+	}
+
+cleanup:
+
+	freeaddrinfo(servinfo);
+
+	return retval;
+}
+
+int net_listen(char* port)
+{
+	struct addrinfo hints, *servinfo, *p;
+	socklen_t storage_size = sizeof(struct sockaddr_storage);
+	int rv;
+	int retval;
+	int tempfd;
+
+	memset(&hints,0,sizeof(hints));
+	
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    #if DEBUG
+    	printf("Trying to listen on port %s\n",port);
+	#endif
+
+	if (NULL == port) {
+		fprintf(stderr,"net_listen: Invalid server or port!\n");
+		return -1;
+	}
+
+	if ((rv = getaddrinfo(NULL,port,&hints,&servinfo)) != 0) {
+		fprintf(stderr, "net_listen: getaddrinfo: %s\n", gai_strerror(rv));
+		return -2;
+	}
+
+	for (p = servinfo; p != NULL; p = p->ai_next) {
+		if (-1 != (sfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)))
+			break;
+	}
+
+	if (NULL == p) {
+		fprintf(stderr, "net_listen: Could not create a socket!\n");
 		retval = -3;
 		goto cleanup;
 	}
 
 	if (0 != bind(sfd, p->ai_addr, p->ai_addrlen)) {
-		#if DEBUG
-			perror("bind error");
-		#endif
-
+		perror("net_listen: bind error");
 		retval = -4;
-		close(sfd);
+		close(sfd); 
 		sfd = -1;
 		goto cleanup;
 	}
 
-	memcpy(&serv_addr,p->ai_addr,p->ai_addrlen);
-	serv_socksize = p->ai_addrlen;
+	if (0 != listen(sfd, 1)) {
+		perror("net_listen: listen error");
+		retval = -5;
+		close(sfd);
+		goto cleanup;
+	}
+
+	if (-1 == (tempfd = accept(sfd,(struct sockaddr *) &rem_addr, &storage_size))) {
+		perror("net_listen: accept error");
+		retval = -6;
+		close(sfd);
+	}
+	close(sfd);
+	sfd = tempfd;
 
 cleanup:
 	freeaddrinfo(servinfo);
@@ -75,7 +136,7 @@ int net_send(net_packet_t* pk)
 	int ret;
 	if (NULL == pk) return -2;
 
-	if (-1 == (ret = sendto(sfd,pk,sizeof(net_packet_t),0,&serv_addr,serv_socksize)))
+	if (-1 == (ret = send(sfd,pk,sizeof(net_packet_t),0)))
 		perror("send failed");
 	return ret;
 }
@@ -83,13 +144,11 @@ int net_send(net_packet_t* pk)
 int net_recv(net_packet_t* pk)
 {
 	int ret;
-	struct sockaddr sa;
-	socklen_t sl;
 
 	if (NULL == pk) return -2;
 
-	if (-1 == (ret = recvfrom(sfd,pk,sizeof(net_packet_t),0,&sa,&sl)))
-		perror("recvfrom failed");
+	if (-1 == (ret = recv(sfd,pk,sizeof(net_packet_t),0)))
+		perror("recv failed");
 
 	return ret;
 }
