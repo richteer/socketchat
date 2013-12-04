@@ -14,4 +14,17 @@
 
 #include "elgamal.h"
 
-// TODO: implement ElGamal
+void eg_gen_key( eg_pub_key_t pub, eg_priv_key_t priv, int bitlength )
+{
+	// TODO
+}
+
+void eg_encrypt( eg_pub_key_t pub, char *ptext, char *ctext )
+{
+	// TODO
+}
+
+void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, char *ctext, char *ptext )
+{
+	// TODO
+}
