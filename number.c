@@ -30,9 +30,13 @@ void gen_number(int bitlength, mpz_t p, gmp_randstate_t r_state)
         mpz_pow_ui(max_value, two, bitlength);
         
         mpz_sub(max_value, max_value, min_value);
-        gmp_fprintf(stderr, "r_state: %X\n", *r_state);
+        gmp_fprintf(stderr, "r_state: %X\n", r_state[5]);
 	mpz_urandomm(p, r_state, max_value);
+	fprintf(stderr, "Did not crash\n");
         mpz_add(p, p, min_value);
+	mpz_clear(min_value);
+	mpz_clear(max_value);
+	mpz_clear(two);
 }
 
 void get_rand_seed(gmp_randstate_t r_state)
@@ -42,7 +46,7 @@ void get_rand_seed(gmp_randstate_t r_state)
 	read(randomData, &seed, sizeof(seed));
 	fprintf(stderr, "seed from /dev/random: %d\n", seed);
 	gmp_randinit_default(r_state);
-	gmp_randseed_ui(r_state, 3);
+	gmp_randseed_ui(r_state, seed);
 
 	//mpz_t test, max;
 	//mpz_init(test); mpz_init(max);
