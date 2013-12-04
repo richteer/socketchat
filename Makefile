@@ -7,22 +7,27 @@ MKDIRS=mkdir -p ${OBJ} ${BIN}
 
 all: ${BIN}/client
 
-tests: ${BIN}/test_number
+tests: ${BIN}/test_number ${BIN}/test_eg
 
 ${BIN}/test_number: ${SRC}/test_number.c ${OBJ}/number.o
 	@${MKDIRS}
 	@echo "Building $@"
 	${CC} ${CFLAGS} $^ -lgmp -o $@
 
-${OBJ}/number.o: ${SRC}/crypto/number.c ${SRC}/crypto/number.h
+${BIN}/test_eg: ${SRC}/test_eg.c ${OBJ}/elgamal.o ${OBJ}/number.o
+	@${MKDIRS}
+	@echo "Building $@"
+	${CC} ${CFLAGS} $^ -lgmp -o $@
+
+${OBJ}/elgamal.o: ${SRC}/crypto/elgamal.c ${SRC}/crypto/elgamal.h
 	@${MKDIRS}
 	@echo "Building $@"
 	${CC} ${CFLAGS} -c $< -lgmp -o $@
 
-${BIN}/test_eg: ${SRC}/test_eg.c ${SRC}/crypto/elgamal.h ${SRC}/crypto/elgamal.c
+${OBJ}/number.o: ${SRC}/crypto/number.c ${SRC}/crypto/number.h
 	@${MKDIRS}
 	@echo "Building $@"
-	${CC} ${CFLAGS} test_eg.c elgamal.c -lgmp
+	${CC} ${CFLAGS} -c $< -lgmp -o $@
 
 ${OBJ}/network.o: ${SRC}/net/network.c ${SRC}/net/network.h
 	@${MKDIRS}
