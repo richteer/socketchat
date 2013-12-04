@@ -24,7 +24,7 @@ int net_init(char* ip, char* port)
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_DGRAM;
 
-	if ((NULL == ip) || (NULL == port)) {
+	if (/*(NULL == ip) || */(NULL == port)) {
 		fprintf(stderr,"Invalid server or port!\n");
 		return -1;
 	}
