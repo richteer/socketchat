@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "network.h"
+#include "net/network.h"
 
 #define ARG_CONNECT (0x1<<1)
 #define ARG_LISTEN  (0x1<<2)

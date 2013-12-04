@@ -1,23 +1,33 @@
 CC=gcc
 CFLAGS=-Wall
+SRC=src
+OBJ=obj
+BIN=bin
+MKDIRS=mkdir -p ${OBJ} ${BIN}
 
-all: network.o client test_number test_eg
+all: ${BIN}/client
 
-test_number: test_number.c number.h number.c
+tests: ${BIN}/test_number
+
+${BIN}/test_number: ${SRC}/test_number.c ${SRC}/crypto/number.h ${SRC}/crypto/number.c
+	@${MKDIRS}
 	@echo "Building test_number"
-	${CC} ${CFLAGS} test_number.c number.c -lgmp
+	${CC} ${CFLAGS} test_number.c number.c -lgmp -o $@
 
-test_eg: test_eg.c elgamal.h elgamal.c
+${BIN}/test_eg: ${SRC}/test_eg.c ${SRC}/crypto/elgamal.h ${SRC}/crypto/elgamal.c
+	@${MKDIRS}
 	@echo "Building test_eg"
 	${CC} ${CFLAGS} test_eg.c elgamal.c -lgmp
 
-network.o: network.c network.h
+${OBJ}/network.o: ${SRC}/net/network.c ${SRC}/net/network.h
+	@${MKDIRS}
 	@echo "Building the Network Library"
 	${CC} ${CFLAGS} -c $< -o $@
 
-client: client.c network.o
+${BIN}/client: ${SRC}/client.c ${OBJ}/network.o
+	@${MKDIRS}
 	@echo "Building the client"
 	${CC} ${CFLAGS} $^ -o $@
 
 clean: 
-	rm -rf *.o a.out client
+	rm -rf obj/ bin/
