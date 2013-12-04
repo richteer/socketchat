@@ -14,22 +14,25 @@
 #include "number.h"
 #include "elgamal.h"
 
-void eg_init_key( eg_pub_key_t pub, eg_priv_key_t priv )
+void eg_init_key( eg_pub_key_t *pub, eg_priv_key_t priv )
 {
-	mpz_init(pub.p);
-	mpz_init(pub.g);
-	mpz_init(pub.beta);
+	mpz_init(pub->p);
+	mpz_init(pub->g);
+	mpz_init(pub->beta);
 
 	if (NULL != (void *) priv) {
 		mpz_init(priv);
 	}
 }
 
-void eg_gen_key( eg_pub_key_t pub, eg_priv_key_t priv, int bitlength )
+void eg_gen_key( eg_pub_key_t *pub, eg_priv_key_t priv, int bitlength )
 {
-	mpz_t q; mpz_init(q);
 	gmp_randstate_t r_state;
 	get_rand_seed(r_state);
+
+	gen_safe_prime(pub->p, bitlength, r_state);
+
+	gmp_randclear(r_state);
 
 }
 

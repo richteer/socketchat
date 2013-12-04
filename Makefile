@@ -9,15 +9,15 @@ all: ${BIN}/client
 
 tests: ${BIN}/test_number
 
-${BIN}/test_number: ${SRC}/test_number.c ${SRC}/crypto/number.h ${SRC}/crypto/number.c
+${BIN}/test_number: ${SRC}/test_number.c ${OBJ}/number.o
 	@${MKDIRS}
-	@echo "Building $@r"
-	${CC} ${CFLAGS} test_number.c number.c -lgmp -o $@
+	@echo "Building $@"
+	${CC} ${CFLAGS} $^ -lgmp -o $@
 
 ${OBJ}/number.o: ${SRC}/crypto/number.c ${SRC}/crypto/number.h
 	@${MKDIRS}
 	@echo "Building $@"
-	${CC} ${CFLAGS} $< -lgmp -o $@
+	${CC} ${CFLAGS} -c $< -lgmp -o $@
 
 ${BIN}/test_eg: ${SRC}/test_eg.c ${SRC}/crypto/elgamal.h ${SRC}/crypto/elgamal.c
 	@${MKDIRS}
