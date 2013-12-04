@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall
 
-all: network.o tests
+all: network.o test_number test_eg
 
 test_number: test_number.c number.h number.c
 	@echo "Building test_number"
