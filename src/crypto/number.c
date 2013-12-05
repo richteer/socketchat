@@ -105,3 +105,22 @@ void get_rand_seed(gmp_randstate_t r_state)
 	gmp_randinit_default(r_state);
 	gmp_randseed_ui(r_state, seed);
 }
+
+void gen_range( mpz_t rop, mpz_t min, mpz_t max, gmp_randstate_t r_state )
+{
+	mpz_t tmax;
+	mpz_init(tmax);
+
+	mpz_sub(tmax, max, min);
+	mpz_urandomm(rop, r_state, tmax);
+	mpz_add(rop, rop, min);
+
+	mpz_clear(tmax);
+}
+
+void gen_range_ui( mpz_t rop, unsigned long int min, mpz_t max, gmp_randstate_t r_state)
+{
+	mpz_t tmin; mpz_init_set_ui(tmin, min);
+	gen_range(rop, tmin, max, r_state);
+	mpz_clear(tmin);
+}
