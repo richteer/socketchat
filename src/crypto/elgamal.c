@@ -52,6 +52,7 @@ void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t *cipher )
 
 	mpz_inits(cipher->mask, cipher->message, NULL);
 	gen_range_ui( cipher->mask, 2, pub.p, r_state );
+	mpz_powm( cipher->mask, pub.g, cipher->mask, pub.p ); // mask is g^rand (mod p)
 
 	// message = beta^mask * plain (mod p)
 	mpz_powm( cipher->message, pub.beta, cipher->mask, pub.p );
@@ -59,7 +60,14 @@ void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t *cipher )
 	mpz_mod( cipher->message, cipher->message, pub.p );
 }
 
-void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, eg_message_t *cipher, mpz_t plain )
+void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, eg_message_t cipher, mpz_t plain )
 {
-	// TODO
+	mpz_t temp; mpz_init(temp);
+
+	mpz_powm( temp, cipher.mask, priv, pub.p );
+	mpz_invert( temp, temp, pub.p );
+	mpz_mul( plain, cipher.message, temp );
+	mpz_mod( plain, plain, pub.p );
+
+	mpz_clear(temp);
 }
