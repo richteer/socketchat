@@ -49,15 +49,23 @@ void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t *cipher )
 {
 	gmp_randstate_t r_state;
 	get_rand_seed(r_state);
+	
+	mpz_t y; mpz_init(y);
+	mpz_t c1; mpz_init(c1);
+	mpz_t c2; mpz_init(c2);
+	mpz_t s; mpz_init(s);
+	
+	mpz_inits(cipher->mask, cipher->message, NULL);
+	gen_range_ui(y, 1, pub.p, r_state);
+	mpz_powm(c1, pub.g, y, pub.p);
+	mpz_powm(s, pub.beta, y, pub.p);
+	mpz_mul(c2, plain, s);
 
 	mpz_inits(cipher->mask, cipher->message, NULL);
-	gen_range_ui( cipher->mask, 2, pub.p, r_state );
-	mpz_powm( cipher->mask, pub.g, cipher->mask, pub.p ); // mask is g^rand (mod p)
+	mpz_set(cipher->mask, c1);
+	mpz_set(cipher->message, c2);
 
-	// message = beta^mask * plain (mod p)
-	mpz_powm( cipher->message, pub.beta, cipher->mask, pub.p );
-	mpz_mul( cipher->message, cipher->message, plain);
-	mpz_mod( cipher->message, cipher->message, pub.p );
+	mpz_clears(y, c1, c2, s, NULL);
 }
 
 void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, eg_message_t cipher, mpz_t plain )
