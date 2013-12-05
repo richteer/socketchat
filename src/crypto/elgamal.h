@@ -14,7 +14,7 @@ typedef mpz_t eg_priv_key_t;
 void eg_init_key( eg_pub_key_t *pub, eg_priv_key_t priv );
 
 void eg_gen_key( eg_pub_key_t *pub, eg_priv_key_t priv, int bitlength );
-void eg_encrypt( eg_pub_key_t pub, char *ptext, char *ctext );
-void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, char *ctext, char *ptext );
+void eg_encrypt( eg_pub_key_t pub, mpz_t plain, mpz_t  cipher);
+void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, mpz_t cipher, mpz_t plain );
 
 #endif

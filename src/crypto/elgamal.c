@@ -45,12 +45,13 @@ void eg_gen_key( eg_pub_key_t *pub, eg_priv_key_t priv, int bitlength )
 
 }
 
-void eg_encrypt( eg_pub_key_t pub, char *ptext, char *ctext )
+void eg_encrypt( eg_pub_key_t pub, mpz_t plain, mpz_t cipher )
 {
-	// TODO
+	mpz_t half_mask; mpz_init(half_mask);
+	
 }
 
-void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, char *ctext, char *ptext )
+void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, mpz_t plain, mpz_t cipher )
 {
 	// TODO
 }
