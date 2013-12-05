@@ -13,7 +13,7 @@ int main()
 	gmp_fprintf(stderr,"Random number: %Zd\n", a);
 	gen_prime(a, 10, r_state);
 	gmp_fprintf(stderr,"Random prime: %Zd\n", a);
-	gen_safe_prime(a, 5, r_state);
+	gen_safe_prime(a, 10, r_state);
 	gmp_fprintf(stderr, "Random safe prime: %Zd\n", a);
 	gen_generator(b, a, r_state);
 	gmp_fprintf(stderr, "Random gen for ^: %Zd\n", b);
