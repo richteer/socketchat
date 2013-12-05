@@ -45,13 +45,21 @@ void eg_gen_key( eg_pub_key_t *pub, eg_priv_key_t priv, int bitlength )
 
 }
 
-void eg_encrypt( eg_pub_key_t pub, mpz_t plain, mpz_t cipher )
+void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t *cipher )
 {
-	mpz_t half_mask; mpz_init(half_mask);
-	
+	gmp_randstate_t r_state;
+	get_rand_seed(r_state);
+
+	mpz_inits(cipher->mask, cipher->message, NULL);
+	gen_range_ui( cipher->mask, 2, pub.p, r_state );
+
+	// message = beta^mask * plain (mod p)
+	mpz_powm( cipher->message, pub.beta, cipher->mask, pub.p );
+	mpz_mul( cipher->message, cipher->message, plain);
+	mpz_mod( cipher->message, cipher->message, pub.p );
 }
 
-void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, mpz_t plain, mpz_t cipher )
+void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, eg_message_t *cipher, mpz_t plain )
 {
 	// TODO
 }

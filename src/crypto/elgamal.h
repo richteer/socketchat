@@ -20,7 +20,7 @@ typedef struct eg_message_s
 void eg_init_key( eg_pub_key_t *pub, eg_priv_key_t priv );
 
 void eg_gen_key( eg_pub_key_t *pub, eg_priv_key_t priv, int bitlength );
-void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t cipher);
-void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, eg_message_t cipher, mpz_t plain );
+void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t *cipher);
+void eg_decrypt( eg_pub_key_t pub, eg_priv_key_t priv, eg_message_t *cipher, mpz_t plain );
 
 #endif
