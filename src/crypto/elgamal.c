@@ -31,6 +31,15 @@ void eg_gen_key( eg_pub_key_t *pub, eg_priv_key_t priv, int bitlength )
 	get_rand_seed(r_state);
 
 	gen_safe_prime(pub->p, bitlength, r_state);
+	gen_generator(pub->g, pub->p, r_state);
+
+	mpz_t temp; mpz_init_set(temp, pub->p);
+	mpz_sub_ui(temp, temp, 2);
+	mpz_urandomm(priv, r_state, temp);
+	mpz_add_ui(priv, priv, 1);
+	mpz_clear(temp);
+
+	mpz_powm(pub->beta, pub->g, priv, pub->p);
 
 	gmp_randclear(r_state);
 
