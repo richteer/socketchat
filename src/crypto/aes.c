@@ -9,27 +9,40 @@ MCRYPT cr_td;
 char cr_key[17] = {0};
 char cr_iv[17] = {0};
 
-int cr_init(char* key)
+int cr_init(char* key, char* iv)
 {
 	strncpy(cr_key,key,16);
-	cr_td = mcrypt_module_open("rijndael-128", NULL, "cbc", NULL);
-	mcrypt_generic_init(cr_td,cr_key,sizeof(cr_key),cr_iv);
+	strncpy(cr_iv,iv,16);
+	//cr_td = mcrypt_module_open("rijndael-128", NULL, "cbc", NULL);
 
 	/* TODO: Fix this */
-	return  (cr_td == MCRYPT_FAILED) ? -1 : 0;
+	return  0;
 }
 
-int cr_close()
+void cr_close()
 {
-	mcrypt_generic_deinit(td);
-	mcrypt_generic_close(td);
+	mcrypt_module_close(cr_td);
 }
 
 int cr_encrypt(char* buffer)
 {
+	cr_td = mcrypt_module_open("rijndael-128", NULL, "cbc", NULL);
+	mcrypt_generic_init(cr_td,cr_key,16,cr_iv);
 	mcrypt_generic(cr_td,buffer,BUF_SIZE);
+	mcrypt_generic_deinit(cr_td);
+	mcrypt_module_close(cr_td);
 
 	return 0;
 }
 
+int cr_decrypt(char* buffer)
+{
+	cr_td = mcrypt_module_open("rijndael-128", NULL, "cbc", NULL);
+	mcrypt_generic_init(cr_td,cr_key,16,cr_iv);
+	mcrypt_generic(cr_td,buffer,BUF_SIZE);
+	mcrypt_generic_deinit(cr_td);
+	mcrypt_module_close(cr_td);
+
+	return 0;
+}
 
