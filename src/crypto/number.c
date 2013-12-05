@@ -21,9 +21,9 @@ void gen_prime(mpz_t p, int bitlength, gmp_randstate_t r_state)
 void gen_safe_prime(mpz_t p, int bitlength, gmp_randstate_t r_state)
 {
 	mpz_t q; mpz_init(q);
-	mpz_set_ui(p, 1);
+	mpz_set_ui(p, 4);
 
-	while ( ! mpz_probab_prime_p(q, 25) )
+	while ( mpz_probab_prime_p(p, 25) == 0)
 	{
 		gen_prime(q, bitlength - 1, r_state);
 		mpz_mul_ui(p, q, 2);

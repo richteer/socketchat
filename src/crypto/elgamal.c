@@ -60,6 +60,7 @@ void eg_encrypt( eg_pub_key_t pub, mpz_t plain, eg_message_t *cipher )
 	mpz_powm(c1, pub.g, y, pub.p);
 	mpz_powm(s, pub.beta, y, pub.p);
 	mpz_mul(c2, plain, s);
+	mpz_mod(c2, c2, pub.p);
 
 	mpz_inits(cipher->mask, cipher->message, NULL);
 	mpz_set(cipher->mask, c1);
