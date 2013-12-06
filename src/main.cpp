@@ -30,6 +30,7 @@ extern "C" {
 unsigned arg_flags = 0;
 char* conip = NULL;
 char* conpo = NULL;
+int bitlength = BITLENGTH;
 
 //static void cli_send(void);
 //static void cli_recv(MainWindow win);
@@ -85,45 +86,24 @@ int main(int argc, char *argv[])
 		return 3;
 	}
 
-	cnet_handshake(arg_flags);
+    cnet_handshake(arg_flags,bitlength);
 
     w.listen();
     w.show();
 
     return a.exec();
 }
-/*
-static void cli_send(MainWindow win)
-{
-	net_packet_t pk;
-	while (1)
-	{
-		printf(">>> ");
-		fgets(pk.body,1024,stdin);
-		pk.size = strlen(pk.body);
-		if (0 == cnet_send(&pk)) break;
-	}
 
-	bail;
-}
-
-static void cli_recv(MainWindow win)
-{
-	net_packet_t pk;
-	while (1) {
-		if (0 == cnet_recv(&pk)) break;
-		printf("Message from friend: %s\n",pk.body);
-	}
-
-	bail;
-}
-*/
 static int handle_args(int argc, char** argv) 
 {
 	int i, ret = 0;
 	for (i = 1; i < argc; i++) {
 		switch(argv[i][1]) {
 			case 'h': show_help(argv[0]); exit(2); 	break;
+            case 'b':
+              if (i+1 >= argc) {ret = -1; break;}
+              bitlength = atoi(argv[++i]);
+              break;
 			case 'c': 
 				arg_flags |= ARG_CONNECT; 
 				if (i+2 >= argc) {ret = -1; break;}
