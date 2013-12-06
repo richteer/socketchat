@@ -64,6 +64,7 @@ void cli_recv(Ui::MainWindow* ui)
     while (1) {
         if (0 >= cnet_recv(&pk)) {
             std::cout << "Error in receiving message\n";
+            return;
         }
         ui->chatLog->append(QString( (std::string("<b><font color=\"red\">Friend:</font></b> ") + std::string(pk.body)).c_str() ));
 
