@@ -1,2 +1,7 @@
 bin*
 obj*
+gmon.out
+perf.data
+src/gmon.out
+src/perf.data
+src/socketchat
