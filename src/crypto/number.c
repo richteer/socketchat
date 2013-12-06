@@ -21,7 +21,7 @@ void gen_prime(mpz_t p, int bitlength, gmp_randstate_t r_state)
 void gen_safe_prime(mpz_t p, int bitlength, gmp_randstate_t r_state)
 {
 	mpz_t q; mpz_init(q);
-	mpz_set_ui(p, 4);
+	mpz_set_ui(p, 4); // Any composite number will do
 
 	while ( mpz_probab_prime_p(p, 25) == 0)
 	{
