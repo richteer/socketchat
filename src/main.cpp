@@ -40,13 +40,11 @@ static void show_help(char*);
 
 static void handle_sigint(int x) { psi; cnet_close(); exit(0); }
 static void handle_sigsegv(int x) { psf; cnet_close(); exit(1); }
-static void handle_sigchld(int x) { while(waitpid(-1, NULL, WNOHANG) > 0); }
 
 
 int main(int argc, char *argv[])
 {
 	int ret;
-    struct sigaction sa;
 
 	if ((argc - 1) && handle_args(argc,argv)) {
 		//fprintf("Error parsing arguments\n");
@@ -61,14 +59,6 @@ int main(int argc, char *argv[])
 	signal(SIGINT,handle_sigint);
 	signal(SIGSEGV,handle_sigsegv);
 	
-    sa.sa_handler = handle_sigchld; // reap all dead processes
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(1);
-    }
-
 	printf("Client started, hit ^C to exit\n");
 	if (arg_flags & ARG_CONNECT) {
 		printf("Trying to connect to %s:%s\n",conip,conpo);
