@@ -136,7 +136,7 @@ int net_send(net_packet_t* pk)
 	int ret;
 	if (NULL == pk) return -2;
 
-	if (-1 == (ret = send(sfd,pk,sizeof(net_packet_t),0)))
+	if (-1 == (ret = send(sfd,pk,sizeof(pk->size) + pk->size,0)))
 		perror("send failed");
 	return ret;
 }
@@ -149,7 +149,9 @@ int net_recv(net_packet_t* pk)
 	memset(pk,0,sizeof(net_packet_t));
 	if (NULL == pk) return -2;
 
-	if (-1 == (ret = recv(sfd,pk,sizeof(net_packet_t),0)))
+	if (-1 == recv(sfd,pk,sizeof(pk->size), MSG_PEEK)) perror("Peek Failed");
+
+	if (-1 == (ret = recv(sfd,pk,sizeof(pk->size) + pk->size,0)))
 		perror("recv failed");
 
 
