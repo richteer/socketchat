@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -pg
 SRC=src
 OBJ=obj
 BIN=bin
