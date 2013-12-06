@@ -12,8 +12,6 @@ void mpz_to_pk(net_packet_t *pk, mpz_t num)
 		       0,0, 
 		       num);
 
-	printf("MPZ to PK size report: %d\n",pk->size);
-
 }
 
 void pk_to_mpz(mpz_t num, net_packet_t *pk)

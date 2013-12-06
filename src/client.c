@@ -2,6 +2,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <stdio.h>
 
 #include "net/packet.h"
@@ -87,6 +88,8 @@ int main(int argc, char **argv)
 		bail 0;
 	}
 
+	cnet_close();
+
 	printf("Connection closed.\n");
 
 	return 0;
@@ -96,11 +99,11 @@ int main(int argc, char **argv)
 static void cli_send(void)
 {
 	net_packet_t pk;
-
 	while (1)
 	{
 		printf(">>> ");
 		fgets(pk.body,1024,stdin);
+		pk.size = strlen(pk.body);
 		if (0 == cnet_send(&pk)) break;
 	}
 

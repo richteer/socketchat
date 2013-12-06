@@ -20,8 +20,8 @@ extern int aes_blocksize;
 
 void cnet_close(void)
 {
-	net_close();
 	aes_close();
+	net_close();
 }
 
 
@@ -83,14 +83,13 @@ static int initialize_aes(eg_pub_key_t *local_pubkey, eg_priv_key_t local_privke
 
 
 	// Send the ElGamal-encrypted message with this client's AES key
-	for (i = 0; (sizeof(eg_message_t)/sizeof(mpz_t)); i++) {
+	for (i = 0; i < (sizeof(eg_message_t)/sizeof(mpz_t)); i++) {
 		mpz_to_pk(&pk,((mpz_t*) &aes_keysend)[i]) ;
 		net_send(&pk);
 	}
-printf("getting here...\n");
 
 	// Wait for the friend's AES key
-	for (i = 0; (sizeof(eg_message_t)/sizeof(mpz_t)); i++) {
+	for (i = 0; i < (sizeof(eg_message_t)/sizeof(mpz_t)); i++) {
 		net_recv(&pk);
 		pk_to_mpz(((mpz_t*) &aes_keysend)[i],&pk);
 	}
@@ -129,7 +128,7 @@ int cnet_send(net_packet_t *pk)
 	if (pk->size NOT_DIVISIBLE_BY aes_blocksize) {
 		pk->size = ((pk->size / aes_blocksize) + 1) * aes_blocksize;
 	}
-	if (pk->size >= sizeof(pk->body)) return -1;
+	if (pk->size >= sizeof(pk->body)) return -7;
 
 	aes_encrypt(pk->body,pk->size);
 
