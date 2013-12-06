@@ -1,8 +1,8 @@
 Socketchat
 ==========
 
-Dependancies:
+Dependencies:
 ------------
-qmake
-gmp
-libmcrypt
+qmake  
+gmp  
+libmcrypt  
