@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <gmp.h>
+#include <string.h>
 
 #include "packet.h"
 #include "network.h"
@@ -125,8 +126,11 @@ int cnet_handshake(int inflags, int bitlength)
 
 int cnet_send(net_packet_t *pk)
 {
+	size_t pksize = pk->size;
+
 	if (pk->size NOT_DIVISIBLE_BY aes_blocksize) {
 		pk->size = ((pk->size / aes_blocksize) + 1) * aes_blocksize;
+		memset(pk+pksize, 0, pk->size - pksize);
 	}
 	if (pk->size >= sizeof(pk->body)) return -7;
 
