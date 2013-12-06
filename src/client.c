@@ -3,12 +3,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <gmp.h>
 
+#include "net/packet.h"
 #include "net/network.h"
-
-#include "crypto/aes.h"
-#include "crypto/elgamal.h"
+#include "net/cryptnet.h"
 
 #define ARG_CONNECT (0x1<<1)
 #define ARG_LISTEN  (0x1<<2)
@@ -16,7 +14,7 @@
 
 #define bail return
 #define psi fprintf(stderr,"Received SIGINT, Quitting...\n")
-#define psf fprintf(stderr,"Received SIGSEGV, Fix Me...\n")
+#define psf fprintf(stderr,"~~~Received SIGSEGV, Fix Me~~~\n")
 
 #define IF_VERBOSE if(arg_flags&ARG_VERBOSE)
 
@@ -28,13 +26,12 @@ char* conpo = NULL;
 
 static void cli_send(void);
 static void cli_recv(void);
-static int cli_handshake(void);
 
 static int handle_args(int,char**);
 static void show_help(char*);
 
-static void handle_sigint(int x) { psi; net_close(); exit(0); }
-static void handle_sigsegv(int x) { psf; net_close(); exit(1); }
+static void handle_sigint(int x) { psi; cnet_close(); exit(0); }
+static void handle_sigsegv(int x) { psf; cnet_close(); exit(1); }
 static void handle_sigchld(int x) { while(waitpid(-1, NULL, WNOHANG) > 0); }
 
 int main(int argc, char **argv)
@@ -77,7 +74,7 @@ int main(int argc, char **argv)
 		return 3;
 	}
 
-	cli_handshake();
+	cnet_handshake(arg_flags);
 
 	if (0 != (pid = fork())) {
 		cli_recv();
@@ -95,56 +92,6 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-static int cli_handshake(void)
-{
-	int i;
-	eg_pub_key_t local_pubkey,rem_pubkey;
-	eg_priv_key_t local_privkey,rem_privkey;
-	net_packet_t pk;
-
-	//char aes_key[16];
-
-	eg_init_key(&local_pubkey,local_privkey);
-	eg_init_key(&rem_pubkey,rem_privkey);
-	eg_gen_key(&local_pubkey,rem_privkey,BITLENGTH);
-
-	IF_VERBOSE gmp_printf("Your public key is:\np = %Zd\ng = %Zd\nb = %Zd\n",
-		local_pubkey.p,local_pubkey.g,local_pubkey.beta);
-
-	IF_VERBOSE printf("Connected to friend, sending public key...\n");
-	// Send the three bigints
-	for (i = 0; i < (sizeof(eg_pub_key_t)/sizeof(mpz_t)); i++) {
-		mpz_to_pk(&pk,((mpz_t*) &local_pubkey)[i]) ;
-		net_send(&pk);
-	}
-
-	IF_VERBOSE printf("Sent the public key!\n");
-
-	// Receive the bigints
-	for (i = 0; i < (sizeof(eg_pub_key_t)/sizeof(mpz_t)); i++) {
-		net_recv(&pk);
-		pk_to_mpz(((mpz_t*) &rem_pubkey)[i],&pk);
-	}
-	IF_VERBOSE printf("Received friend's public key...\n");
-	
-	IF_VERBOSE gmp_printf("Friend's public key is:\np = %Zd\ng = %Zd\nb = %Zd\n",
-		rem_pubkey.p,rem_pubkey.g,rem_pubkey.beta);
-
-	IF_VERBOSE printf("Sending Secret key...\n");
-	//aes_random_key(aes_key);
-	//aes_init(aes_key,"AAAAAAAAAAAAAAAA");
-
-	//eg_encrypt(rem_pubkey,);
-
-	// SEND RANDOMLY GENERATED SECRET KEY HERE
-
-
-
-	// WAIT FOR SECRET KEY HERE
-	IF_VERBOSE printf("Handshake Complete!\n");
-	exit(1);
-	return 0;
-}
 
 static void cli_send(void)
 {
@@ -154,7 +101,7 @@ static void cli_send(void)
 	{
 		printf(">>> ");
 		fgets(pk.body,1024,stdin);
-		if (0 == net_send(&pk)) break;
+		if (0 == cnet_send(&pk)) break;
 	}
 
 	bail;
@@ -164,7 +111,7 @@ static void cli_recv(void)
 {
 	net_packet_t pk;
 	while (1) {
-		if (0 == net_recv(&pk)) break;
+		if (0 == cnet_recv(&pk)) break;
 		printf("Message from friend: %s\n",pk.body);
 	}
 

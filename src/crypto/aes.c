@@ -1,9 +1,10 @@
 #include <mcrypt.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-#define AES_KEY_SIZE 16
+#include "aes.h"
 
 MCRYPT aes_td;
 char aes_key[17] = {0};
@@ -50,6 +51,7 @@ int aes_decrypt(char* buffer, size_t bufsize)
 
 void aes_random_key(char* key)
 {
+	int i;
 	int randomData = open("/dev/urandom", O_RDONLY);
 
 	for (i = 0; i < (AES_KEY_SIZE/sizeof(unsigned)); i++) {

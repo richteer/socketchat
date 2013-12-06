@@ -44,15 +44,20 @@ ${OBJ}/network.o: ${SRC}/net/network.c ${SRC}/net/network.h ${SRC}/net/packet.h
 	@echo "Building $@"
 	${CC} ${CFLAGS} -c $< -o $@
 
+${OBJ}/cryptnet.o: ${SRC}/net/cryptnet.c ${SRC}/net/cryptnet.h ${OBJ}/network.o ${OBJ}/packet.o
+	@${MKDIRS}
+	@echo "Building $@"
+	${CC} ${CFLAGS} -c $< -o $@
+
 ${OBJ}/packet.o: ${SRC}/net/packet.c ${SRC}/net/packet.h 
 	@${MKDIRS}
 	@echo "Building $@"
 	${CC} ${CFLAGS} -c $< -lgmp -o $@
 
-${BIN}/client: ${SRC}/client.c ${OBJ}/network.o ${OBJ}/packet.o ${OBJ}/elgamal.o ${OBJ}/number.o
+${BIN}/client: ${SRC}/client.c ${OBJ}/network.o ${OBJ}/packet.o ${OBJ}/elgamal.o ${OBJ}/number.o ${OBJ}/cryptnet.o ${OBJ}/aes.o
 	@${MKDIRS}
 	@echo "Building $@"
-	${CC} ${CFLAGS} $^ -lgmp -o $@
+	${CC} ${CFLAGS} $^ -lgmp -lmcrypt -o $@
 
 clean: 
 	rm -rf obj/ bin/
