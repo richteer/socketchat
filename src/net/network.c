@@ -143,12 +143,15 @@ int net_send(net_packet_t* pk)
 
 int net_recv(net_packet_t* pk)
 {
+	//printf("received a packet yo\n");
 	int ret;
 
+	memset(pk,0,sizeof(net_packet_t));
 	if (NULL == pk) return -2;
 
 	if (-1 == (ret = recv(sfd,pk,sizeof(net_packet_t),0)))
 		perror("recv failed");
+
 
 	return ret;
 }
