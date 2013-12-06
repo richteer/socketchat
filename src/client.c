@@ -38,8 +38,8 @@ static void handle_sigchld(int x) { while(waitpid(-1, NULL, WNOHANG) > 0); }
 int main(int argc, char **argv)
 {
 	int ret;
-    struct sigaction sa;
-    pid_t pid;
+	struct sigaction sa;
+	pid_t pid;
 
 	if ((argc - 1) && handle_args(argc,argv)) {
 		//fprintf("Error parsing arguments\n");
@@ -49,14 +49,14 @@ int main(int argc, char **argv)
 
 	signal(SIGINT,handle_sigint);
 	signal(SIGSEGV,handle_sigsegv);
-	
-    sa.sa_handler = handle_sigchld; // reap all dead processes
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(1);
-    }
+
+	sa.sa_handler = handle_sigchld; // reap all dead processes
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+		perror("sigaction");
+		exit(1);
+	}
 
 	printf("Client started, hit ^C to exit\n");
 	if (arg_flags & ARG_CONNECT) {
@@ -128,17 +128,17 @@ static int handle_args(int argc, char** argv)
 		switch(argv[i][1]) {
 			case 'h': show_help(argv[0]); exit(2); 	break;
 			case 'c': 
-				arg_flags |= ARG_CONNECT; 
-				if (i+2 >= argc) {ret = -1; break;}
-				conip = argv[++i];
-				conpo = argv[++i];
-				break;
+				  arg_flags |= ARG_CONNECT; 
+				  if (i+2 >= argc) {ret = -1; break;}
+				  conip = argv[++i];
+				  conpo = argv[++i];
+				  break;
 			case 'l':
 			case 'w':
-				arg_flags |= ARG_LISTEN;
-				if (i+1 >= argc) {ret = -1; break;}
-				conpo = argv[++i];
-				break;
+				  arg_flags |= ARG_LISTEN;
+				  if (i+1 >= argc) {ret = -1; break;}
+				  conpo = argv[++i];
+				  break;
 			case 'v': arg_flags |= ARG_VERBOSE; break;
 			default: ret = -1;
 		}
