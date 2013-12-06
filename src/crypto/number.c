@@ -104,6 +104,7 @@ void get_rand_seed(gmp_randstate_t r_state)
 	read(randomData, &seed, sizeof(seed));
 	gmp_randinit_default(r_state);
 	gmp_randseed_ui(r_state, seed);
+	close(randomData);
 }
 
 void gen_range( mpz_t rop, mpz_t min, mpz_t max, gmp_randstate_t r_state )
