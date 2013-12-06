@@ -3,6 +3,7 @@
 #include <thread>
 #include <string>
 #include <cstring>
+#include <iostream>
 
 extern "C" {
 #undef __cplusplus
@@ -20,11 +21,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    thread t1(MainWindow::cli_recv);
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    t1.join();
 }
 
 
@@ -42,9 +47,26 @@ void MainWindow::on_inputBox_returnPressed()
 	memcpy(pk.body,msg.c_str(),msg.length());
 
 	cnet_send(&pk);
+
+    std::cout << "Sent message: '" << msg << "'!" << std::endl;
 }
 
 void MainWindow::on_sendButton_clicked()
 {
+
+}
+
+void MainWindow::cli_recv()
+{
+    net_packet_t pk;
+
+    while (1) {
+        cnet_recv(&pk);
+        cout << "Received a message!";
+        ui->chatLog->append();
+
+
+    }
+
 
 }

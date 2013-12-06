@@ -18,6 +18,7 @@ public:
 private slots:
 	void on_inputBox_returnPressed();
 	void on_sendButton_clicked();
+	void cli_recv();
 
 public slots:
     void closing();

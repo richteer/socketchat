@@ -16,7 +16,7 @@ int net_connect(char* ip, char* port)
 {
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
-	int retval;
+	int retval = 0;
 
 	memset(&hints,0,sizeof(hints));
 	
@@ -63,7 +63,7 @@ int net_listen(char* port)
 	struct addrinfo hints, *servinfo, *p;
 	socklen_t storage_size = sizeof(struct sockaddr_storage);
 	int rv;
-	int retval;
+	int retval = 0;
 	int tempfd;
 
 	memset(&hints,0,sizeof(hints));
