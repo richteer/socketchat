@@ -14,17 +14,21 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void listen(void);
 
 private slots:
 	void on_inputBox_returnPressed();
 	void on_sendButton_clicked();
-	void cli_recv();
 
 public slots:
     void closing();
 
 private:
     Ui::MainWindow *ui;
+
 };
+
+void cli_recv(Ui::MainWindow* ui);
+
 
 #endif // MAINWINDOW_H

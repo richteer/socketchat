@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 
 	cnet_handshake(arg_flags);
 
+    w.listen();
     w.show();
 
     return a.exec();

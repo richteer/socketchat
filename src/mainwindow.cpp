@@ -12,24 +12,17 @@ extern "C" {
 }
 
 
-extern int argc_derp;
-extern char **argv_derp;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    thread t1(MainWindow::cli_recv);
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
-    t1.join();
 }
 
 
@@ -41,32 +34,39 @@ void MainWindow::closing()
 void MainWindow::on_inputBox_returnPressed()
 {
 	net_packet_t pk;
-	std::string msg;
+    std::string msg;
     msg = (ui->inputBox->text()).toStdString() ;
 	pk.size = msg.length();
 	memcpy(pk.body,msg.c_str(),msg.length());
 
 	cnet_send(&pk);
 
-    std::cout << "Sent message: '" << msg << "'!" << std::endl;
+    ui->chatLog->append(QString( (std::string("<b><font color=\"blue\">You:</font></b> ") + msg).c_str()  ));
+
+    ui->inputBox->setText(QString(""));
+
 }
 
 void MainWindow::on_sendButton_clicked()
 {
-
+    this->on_inputBox_returnPressed();
 }
 
-void MainWindow::cli_recv()
+void MainWindow::listen(void)
+{
+    static std::thread t1(cli_recv,ui);
+}
+
+void cli_recv(Ui::MainWindow* ui)
 {
     net_packet_t pk;
 
     while (1) {
-        cnet_recv(&pk);
-        cout << "Received a message!";
-        ui->chatLog->append();
-
+        if (0 >= cnet_recv(&pk)) {
+            std::cout << "Error in receiving message\n";
+        }
+        ui->chatLog->append(QString( (std::string("<b><font color=\"red\">Friend:</font></b> ") + std::string(pk.body)).c_str() ));
 
     }
-
 
 }
