@@ -6,7 +6,8 @@
 int main()
 {
 	char string[256] = {0};
-	strcpy(string,"test");
+
+	fgets(string,256,stdin);
 
 	cr_init("derpderpderpderp","AAAAAAAAAAAAAAAA");
 
@@ -18,7 +19,7 @@ int main()
 	printf("Plaintext after : %s\n",string);
 
 
-	//cr_close();
+	cr_close();
 
 	return 0;
 }
