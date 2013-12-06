@@ -22,6 +22,7 @@
 #define BITLENGTH 20
 
 unsigned arg_flags = 0;
+int bitlength = BITLENGTH;
 char* conip = NULL;
 char* conpo = NULL;
 
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
 		return 3;
 	}
 
-	cnet_handshake(arg_flags);
+	cnet_handshake(arg_flags, bitlength);
 
 	if (0 != (pid = fork())) {
 		cli_recv();
@@ -127,6 +128,10 @@ static int handle_args(int argc, char** argv)
 	for (i = 1; i < argc; i++) {
 		switch(argv[i][1]) {
 			case 'h': show_help(argv[0]); exit(2); 	break;
+			case 'b': 
+				  if (i+1 >= argc) {ret = -1; break;}
+				  bitlength = atoi(argv[++i]);
+				  break;
 			case 'c': 
 				  arg_flags |= ARG_CONNECT; 
 				  if (i+2 >= argc) {ret = -1; break;}

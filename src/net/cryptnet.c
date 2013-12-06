@@ -9,7 +9,6 @@
 
 #define ARG_VERBOSE (0x1<<3)
 
-#define BITLENGTH 20
 
 #define IF_VERBOSE if(arg_flags&ARG_VERBOSE)
 #define NOT_DIVISIBLE_BY %
@@ -25,14 +24,15 @@ void cnet_close(void)
 }
 
 
-static int exchange_elgamal(eg_pub_key_t *local_pubkey, eg_priv_key_t local_privkey, eg_pub_key_t *remote_pubkey)
+static int exchange_elgamal(eg_pub_key_t *local_pubkey, eg_priv_key_t local_privkey, eg_pub_key_t *remote_pubkey, int bitlength)
 {
 	int i;
 	net_packet_t pk;
 
+	IF_VERBOSE printf("Generating ElGamal public-private key pair");
 	eg_init_key(local_pubkey,local_privkey);
 	eg_init_key(remote_pubkey,NULL);
-	eg_gen_key(local_pubkey,local_privkey,BITLENGTH);
+	eg_gen_key(local_pubkey,local_privkey,bitlength);
 
 	IF_VERBOSE gmp_printf("Your public key is:\np = %Zd\ng = %Zd\nb = %Zd\n",
 		local_pubkey->p,local_pubkey->g,local_pubkey->beta);
@@ -108,13 +108,13 @@ static int initialize_aes(eg_pub_key_t *local_pubkey, eg_priv_key_t local_privke
 	return 0;
 }
 
-int cnet_handshake(int inflags)
+int cnet_handshake(int inflags, int bitlength)
 {
 	arg_flags = inflags;
 	eg_pub_key_t local_pubkey, remote_pubkey;
 	eg_priv_key_t local_privkey;
 
-	exchange_elgamal(&local_pubkey, local_privkey, &remote_pubkey);
+	exchange_elgamal(&local_pubkey, local_privkey, &remote_pubkey, bitlength);
 
 	initialize_aes(&local_pubkey, local_privkey, &remote_pubkey);
 
